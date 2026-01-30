@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Live Countdown</title>
+  <meta name="description" content="Live countdown to our next launch." />
+  <meta property="og:title" content="⏳ Countdown is On!" />
+  <meta property="og:description" content="See how long until it begins." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://yourdomain.com/social-preview.jpg" />
+  <meta property="og:url" content="https://yourdomain.com/countdown.html" />
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --card: #121a2b;
+      --digit: #e6f0ff;
+      --accent: #4da3ff;
+      --muted: #94a3b8;
+      --brand: #00c389; /* Change to your brand color */
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 20% 10%, #0e1630 0%, var(--bg) 50%), var(--bg);
+      color: var(--digit);
+    }
+    .wrap {
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .card {
+      width: min(960px, 92vw);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: clamp(20px, 4vw, 40px);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+    }
+    header {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      margin-bottom: 18px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px; font-weight: 700;
+      letter-spacing: 0.3px; color: #d9f7ef;
+    }
+    .dot { width: 12px; height: 12px; background: var(--brand); border-radius: 50%; }
+    .subtitle { color: var(--muted); font-size: 0.95rem; }
+    h1 {
+      margin: 6px 0 14px; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800;
+      background: linear-gradient(90deg, #e6f0ff, #9bd0ff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(10px, 2vw, 16px);
+    }
+    .unit {
+      background: linear-gradient(180deg, #0f172a, #0b1223);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: clamp(12px, 2.4vw, 16px);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .label {
+      text-transform: uppercase; letter-spacing: 0.18em;
+      font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;
+    }
+    .digits {
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1;
+      display: inline-flex;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #111a2f, #0b1222);
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: inset 0 -6px 14px rgba(0,0,0,0.35);
+    }
+    .hint {
+      margin-top: 14px; font-size: 0.85rem; color: var(--muted);
+    }
+    footer {
+      margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      justify-content: space-between; color: var(--muted);
+    }
+    .button {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(90deg, var(--brand), #28d3a2);
+      color: #07261b; font-weight: 700; border: none; border-radius: 12px;
+      padding: 10px 14px; cursor: pointer;
+      text-decoration: none; transition: transform .08s ease;
+    }
+    .button:active { transform: translateY(1px) scale(0.99); }
+    .pill {
+      background: rgba(77,163,255,0.1);
+      border: 1px solid rgba(77,163,255,0.25);
+      color: #cfe6ff;
+      padding: 8px 12px; border-radius: 999px; font-size: 0.9rem;
+    }
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="region" aria-label="Live countdown">
+      <header>
+        <div class="brand"><span class="dot"></span> <span>Countdown</span></div>
+        <div class="subtitle" id="tzLabel"></div>
+      </header>
+
+      <h1 id="headline">Launching Soon</h1>
+
+      <div class="grid" aria-live="polite" aria-atomic="true">
+        <div class="unit">
+          <div class="label">Days</div>
+          <div class="digits" id="d">00</div>
+        </div>
+        <div class="unit">
+          <div class="label">Hours</div>
+          <div class="digits" id="h">00</div>
+        </div>
+        <div class="unit">
+          <div class="label">Minutes</div>
+          <div class="digits" id="m">00</div>
+        </div>
+        <div class="unit">
+          <div class="label">Seconds</div>
+          <div class="digits" id="s">00</div>
+        </div>
+      </div>
+
+      <div class="hint" id="targetText">Target: —</div>
+
+      <footer>
+        <span class="pill">Share this link in your post to keep it live</span>
+        <a class="button" href="#" id="share
+    </div>
+  </div>
+
+  <script>
+    // ====== CONFIGURE YOUR EVENT HERE ======
+    // Example: Jan 31, 2026 20:00 in Port Moresby time (GMT+10)
+    // TIP: Set in ISO format with explicit offset to avoid ambiguity.
+    // Format: YYYY-MM-DDTHH:MM:SS±HH:MM
+    const TARGET_ISO = "2026-01-31T20:00:00+10:00";
+    const HEADLINE = "Product Premiere";
+
+    // ====== COUNTDOWN LOGIC ======
+    const target = new Date(TARGET_ISO);
+    const dEl = document.getElementById('d');
+    const hEl = document.getElementById('h');
+    const mEl = document.getElementById('m');
+    const sEl = document.getElementById('s');
+    const textEl = document.getElementById('targetText');
+    const tzEl = document.getElementById('tzLabel');
+    const headlineEl = document.getElementById('headline');
+
+    headlineEl.textContent = HEADLINE;
+
+    // Display timezone and formatted target time for clarity
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    tzEl.textContent = `Your timezone: ${tz}`;
+    const fmt = new Intl.DateTimeFormat(undefined, {
+      dateStyle: "full",
+      timeStyle: "long"
+    });
+    textEl.textContent = `Target: ${fmt.format(target)}`;
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+      const now = new Date();
+      let diff = target - now;
+      if (diff <= 0) {
+        dEl.textContent = '00'; hEl.textContent = '00';
+        mEl.textContent = '00'; sEl.textContent = '00';
+        headlineEl.textContent = "We're Live!";
+        return;
+      }
+      const secs = Math.floor(diff / 1000);
+      const days = Math.floor(secs / 86400);
+      const hours = Math.floor((secs % 86400) / 3600);
+      const mins = Math.floor((secs % 3600) / 60);
+      const s = secs % 60;
+
+      dEl.textContent = pad(days);
+      hEl.textContent = pad(hours);
+      mEl.textContent = pad(mins);
+      sEl.textContent = pad(s);
+    }
+
+    tick();
+    const timer = setInterval(tick, 1000);
+
+    // Share link helper — copy current page URL
+    document.getElementById('shareBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await navigator.clipboard.writeText(location.href);
+        e.target.textContent = "Link copied ✅";
+        setTimeout(() => e.target.textContent = "Copy Share Link", 2000);
+      } catch (err) {
+        alert("Copy failed. Manually copy the URL from your browser.");
+      }
+    });
+  </script>
+</body>
+</html>
+``
